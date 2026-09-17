@@ -9,13 +9,13 @@ import { LoginModal } from '../auth/LoginModal'
 
 const LINKS = [
   { id: 'academics', label: 'Academics' },
-  { id: 'ethos', label: 'Ethos' },
-  { id: 'leadership', label: 'Leadership' },
-  { id: 'programs', label: 'Programs' },
-  { id: 'campus', label: 'Campus' },
-  { id: 'transit', label: 'Transit' },
-  { id: 'voices', label: 'Voices' },
+  { id: 'campus-life', label: 'Campus Tour' },
+  { id: 'ethos', label: 'About Us' },
+  { id: 'activities', label: 'Activities' },
+  { id: 'programs', label: 'Wings' },
+  { id: 'transit', label: 'Bhopal Transit' },
   { id: 'admissions', label: 'Admissions' },
+  { id: 'contact', label: 'Contact' },
 ]
 
 export function PortalNav() {

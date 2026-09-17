@@ -3,15 +3,18 @@ import { MessageCircle, ArrowUp, Sparkles, LogIn } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { PortalNav } from './PortalNav'
 import { Hero } from './Hero'
+import { CampusVideoShowcase } from './CampusVideoShowcase'
 import { RivertonEthosSection } from './RivertonEthosSection'
 import { LeadershipSection } from './LeadershipSection'
 import { ProgramsSection } from './ProgramsSection'
+import { ActivitiesSection } from './ActivitiesSection'
 import { CampusSection } from './CampusSection'
 import { BhopalTransitSection } from './BhopalTransitSection'
 import { Testimonials } from './Testimonials'
 import { PricingSection } from './PricingSection'
 import { DemoBookingSection } from './DemoBookingSection'
 import { AdmissionsSection } from './AdmissionsSection'
+import { ContactSection } from './ContactSection'
 import { PortalFooter } from './PortalFooter'
 import { CelebrationBurst } from '../ui/CelebrationBurst'
 import { LoginModal } from '../auth/LoginModal'
@@ -40,15 +43,18 @@ export function PublicPortal() {
       <PortalNav />
       <main>
         <Hero />
+        <CampusVideoShowcase />
         <RivertonEthosSection />
         <LeadershipSection />
         <ProgramsSection />
+        <ActivitiesSection />
         <CampusSection />
         <BhopalTransitSection />
         <Testimonials />
         <PricingSection onBookDemo={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })} />
         <DemoBookingSection />
         <AdmissionsSection />
+        <ContactSection />
       </main>
       <PortalFooter />
 
