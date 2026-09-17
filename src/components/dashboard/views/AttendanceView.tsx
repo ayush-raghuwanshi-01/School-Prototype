@@ -7,8 +7,11 @@ import {
   ChevronRight,
   Clock3,
   Filter,
+  Radio,
   RotateCcw,
   Search,
+  Send,
+  Sparkles,
   Thermometer,
   TrendingDown,
   UserX,
@@ -49,7 +52,18 @@ function heatClass(rate: number, holiday: boolean) {
 const MARK_TONE: Record<AttendanceMark, Tone> = { present: 'emerald', late: 'amber', absent: 'rose' }
 
 export function AttendanceView() {
-  const { attendance, setAttendanceMark, bulkAttendance, attendanceReset, pushToast, role } = useApp()
+  const {
+    attendance,
+    setAttendanceMark,
+    bulkAttendance,
+    attendanceReset,
+    pushToast,
+    role,
+    setBiometricModalOpen,
+    setWhatsAppModalOpen,
+    setWhatsAppInvoice,
+  } = useApp()
+  const [aiScanning, setAiScanning] = useState(false)
   const [monthIdx, setMonthIdx] = useState(5)
   const [selected, setSelected] = useState<string | null>(null)
   const [query, setQuery] = useState('')
@@ -133,6 +147,14 @@ export function AttendanceView() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
+          <Button
+            size="sm"
+            variant="outline"
+            icon={<Radio className="h-3.5 w-3.5 text-emerald-600 animate-pulse" />}
+            onClick={() => setBiometricModalOpen(true)}
+          >
+            RFID Gate Terminal
+          </Button>
           <Pill tone={rate >= 90 ? 'emerald' : rate >= 80 ? 'amber' : 'rose'} dot>
             Today at {rate.toFixed(1)}%
           </Pill>
@@ -201,6 +223,75 @@ export function AttendanceView() {
             <p className="mt-1.5 text-[11px] text-ink-400">{s.sub}</p>
           </motion.div>
         ))}
+      </div>
+
+      {/* AI Attendance Insights & Dropout Warning Banner */}
+      <div className="rounded-2xl border border-purple-200/80 bg-gradient-to-r from-purple-50/80 via-white to-pink-50/60 p-4 shadow-xs dark:border-purple-500/20 dark:from-purple-950/30 dark:via-ink-900 dark:to-pink-950/20">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300">
+              <Sparkles className="h-4.5 w-4.5" />
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-bold text-ink-900 dark:text-white">
+                  AI Attendance Pattern Radar · Early Dropout Prevention
+                </span>
+                <Pill tone="rose" className="text-[10px] py-0.5">
+                  {belowNorm.length} Students At Risk
+                </Pill>
+              </div>
+              <p className="mt-0.5 text-[12px] leading-relaxed text-ink-600 dark:text-ink-300">
+                Machine learning identified 3 students with Monday absenteeism patterns falling below the 75% CBSE norm.
+                Proactive WhatsApp alerts can be broadcast with 1-click.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              loading={aiScanning}
+              icon={<Sparkles className="h-3.5 w-3.5 text-purple-600" />}
+              onClick={() => {
+                setAiScanning(true)
+                setTimeout(() => {
+                  setAiScanning(false)
+                  pushToast({
+                    tone: 'success',
+                    title: 'AI Scan complete',
+                    description: 'No new attendance anomalies detected for Section XII-B.',
+                  })
+                }, 1000)
+              }}
+            >
+              Scan Patterns
+            </Button>
+            <Button
+              size="sm"
+              variant="primary"
+              icon={<Send className="h-3.5 w-3.5" />}
+              className="bg-purple-600 hover:bg-purple-700 shadow-sm text-white"
+              onClick={() => {
+                setWhatsAppInvoice({
+                  id: 'INV-ATTN-BULK',
+                  studentId: 's-bulk',
+                  studentName: 'Aarav Sharma & 2 others',
+                  classId: 'Class XII-B',
+                  term: 'Term 2 (Attendance Notice)',
+                  heads: [{ label: 'Tuition', amount: 42500 }],
+                  amount: 42500,
+                  dueDate: '2026-09-20',
+                  status: 'overdue',
+                })
+                setWhatsAppModalOpen(true)
+              }}
+            >
+              WhatsApp At-Risk Parents
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[1.35fr_1fr]">

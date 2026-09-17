@@ -55,6 +55,8 @@ import { SkeletonList, SkeletonStatGrid } from '../../ui/Skeleton'
 import { AXIS_STYLE, ChartFrame, ChartTooltip } from '../ChartKit'
 import { DataBar, PanelCard, PriorityPill, RatingStars, SectionLink, SentimentPill, TaskRow } from '../Panels'
 import { cn, inrCompact } from '../../../lib/utils'
+import { RoiStrip } from '../RoiStrip'
+import { LiveTicker } from '../LiveTicker'
 
 const NOTE_TONES: Record<NoteTone, { card: string; chip: string; label: string }> = {
   brand: {
@@ -114,12 +116,28 @@ export function OverviewView() {
     setView,
     pushToast,
     attendance,
+    setBiometricModalOpen,
+    setWhatsAppModalOpen,
+    setWhatsAppInvoice,
   } = useApp()
 
+  const [aiAnalyzing, setAiAnalyzing] = useState(false)
   const [taskFilter, setTaskFilter] = useState<'open' | 'high' | 'done'>('open')
   const [noteComposer, setNoteComposer] = useState(false)
   const [taskComposer, setTaskComposer] = useState(false)
   const loading = useSimulatedLoad('overview', 620)
+
+  const triggerAiAnalysis = () => {
+    setAiAnalyzing(true)
+    setTimeout(() => {
+      setAiAnalyzing(false)
+      pushToast({
+        tone: 'success',
+        title: 'AI Attendance Radar refreshed',
+        description: 'Analyzed 1,420 biometric logs · 3 students flagged for chronic absenteeism patterns.',
+      })
+    }, 1200)
+  }
 
   const canApprove = role.views.includes('approvals')
   const canReview = role.views.includes('reviews')
@@ -193,6 +211,12 @@ export function OverviewView() {
           </Button>
         </div>
       </div>
+
+      {/* ---------------- Value / ROI Strip (Executive Proof) ---------------- */}
+      <RoiStrip />
+
+      {/* ---------------- Live Activity Ticker (Perceived Real-Time Credibility) ---------------- */}
+      <LiveTicker onOpenBiometric={() => setBiometricModalOpen(true)} />
 
       {/* ---------------- KPI band ---------------- */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -328,6 +352,122 @@ export function OverviewView() {
                   </p>
                 </div>
               ) : null}
+            </div>
+          </PanelCard>
+
+          {/* AI Attendance Insights & Retention Radar (AI Wow Differentiator) */}
+          <PanelCard
+            title="AI Attendance Radar · Students Needing Attention"
+            subtitle="Predictive pattern algorithms identifying chronic absence & drop-out risks"
+            icon={<Sparkles className="h-4 w-4 text-purple-500" />}
+            action={
+              <Button
+                size="sm"
+                variant="outline"
+                loading={aiAnalyzing}
+                icon={<Sparkles className="h-3 w-3 text-purple-500" />}
+                onClick={triggerAiAnalysis}
+              >
+                {aiAnalyzing ? 'Analyzing Logs…' : 'Refresh AI Radar'}
+              </Button>
+            }
+          >
+            <div className="space-y-3">
+              {[
+                {
+                  name: 'Rohan Gupta',
+                  classId: 'Class IX-B',
+                  drop: '-18.4%',
+                  currentPct: '72.1%',
+                  pattern: '3 consecutive Mondays absent · High risk of dropping below CBSE 75% norm',
+                  urgency: 'high' as const,
+                  action: 'WhatsApp Parent',
+                },
+                {
+                  name: 'Simran Kaur',
+                  classId: 'Class XI-A',
+                  drop: '-11.2%',
+                  currentPct: '74.8%',
+                  pattern: 'Consistent Friday absenteeism (68% Fri vs 96% Tue-Thu) · Suspected coaching overlap',
+                  urgency: 'high' as const,
+                  action: 'Teacher Mentor',
+                },
+                {
+                  name: 'Aditya Verma',
+                  classId: 'Class X-C',
+                  drop: '-9.5%',
+                  currentPct: '79.0%',
+                  pattern: 'Consecutive post-lunch period unpunctuality flagged by Gate 02 sensor',
+                  urgency: 'medium' as const,
+                  action: 'Review Log',
+                },
+              ].map((student) => (
+                <div
+                  key={student.name}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink-200/70 bg-white/70 p-3.5 transition-colors hover:border-brand-300 dark:border-white/8 dark:bg-white/[0.02]"
+                >
+                  <div className="flex items-start gap-3">
+                    <span
+                      className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xl font-bold text-xs ${
+                        student.urgency === 'high'
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'
+                          : 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
+                      }`}
+                    >
+                      {student.drop}
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13px] font-bold text-ink-900 dark:text-white">{student.name}</span>
+                        <span className="text-[11px] font-medium text-ink-400">({student.classId})</span>
+                        <Pill tone={student.urgency === 'high' ? 'rose' : 'amber'} className="text-[9.5px] py-0">
+                          {student.currentPct} Attendance
+                        </Pill>
+                      </div>
+                      <p className="mt-1 text-[11.5px] leading-snug text-ink-500 dark:text-ink-400">
+                        {student.pattern}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-[11px] h-8"
+                      onClick={() => {
+                        setWhatsAppInvoice({
+                          id: 'INV-ATTN-01',
+                          studentId: 's-attn',
+                          studentName: student.name,
+                          classId: student.classId,
+                          term: 'Term 2 (Attendance Alert)',
+                          heads: [{ label: 'Tuition Fee', amount: 42500 }],
+                          amount: 42500,
+                          dueDate: '2026-09-20',
+                          status: 'overdue',
+                        })
+                        setWhatsAppModalOpen(true)
+                      }}
+                    >
+                      {student.action}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-3.5 flex items-center justify-between rounded-xl bg-purple-50/80 px-3 py-2 text-[11px] font-medium text-purple-900 dark:bg-purple-950/20 dark:text-purple-300">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+                AI scans attendance logs at 08:30 AM daily and drafts proactive alerts.
+              </span>
+              <button
+                onClick={() => setView('attendance')}
+                className="font-bold text-purple-700 hover:underline dark:text-purple-300"
+              >
+                View full attendance matrix →
+              </button>
             </div>
           </PanelCard>
 

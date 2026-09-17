@@ -22,6 +22,12 @@ import { AdmissionsView } from './views/AdmissionsView'
 import { ChildView } from './views/ChildView'
 import { Pill } from '../ui/Badge'
 import { Button } from '../ui/Button'
+import { CelebrationBurst } from '../ui/CelebrationBurst'
+import { GuidedTour, TOUR_STEPS } from './GuidedTour'
+import { BiometricScanModal } from './BiometricScanModal'
+import { WhatsAppReminderModal } from './WhatsAppReminderModal'
+import { ReportCardModal } from './ReportCardModal'
+import { TeacherChatModal } from './TeacherChatModal'
 
 const VIEW_LABEL: Record<ViewKey, string> = {
   overview: 'Command Centre',
@@ -41,7 +47,34 @@ const VIEW_LABEL: Record<ViewKey, string> = {
 }
 
 export function DashboardShell() {
-  const { view, setView, role, setPaletteOpen, setRoute } = useApp()
+  const {
+    view,
+    setView,
+    role,
+    setPaletteOpen,
+    setRoute,
+    pushToast,
+    tourActive,
+    tourStep,
+    nextTour,
+    prevTour,
+    endTour,
+    jumpToTourStep,
+    celebrationPayload,
+    clearCelebration,
+    biometricModalOpen,
+    setBiometricModalOpen,
+    whatsAppModalOpen,
+    setWhatsAppModalOpen,
+    whatsAppInvoice,
+    whatsAppIsBatch,
+    reportCardModalOpen,
+    setReportCardModalOpen,
+    reportCardStudent,
+    reportCardRemark,
+    chatModalOpen,
+    setChatModalOpen,
+  } = useApp()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Command palette can hop back to the public site.
@@ -52,6 +85,41 @@ export function DashboardShell() {
   }, [setRoute])
 
   const allowed = role.views.includes(view)
+
+  const handleTourNext = () => {
+    const nextIdx = tourStep + 1
+    if (nextIdx < TOUR_STEPS.length) {
+      const step = TOUR_STEPS[nextIdx]
+      setView(step.view)
+      nextTour()
+      if (step.actionTrigger === 'open-biometric') setBiometricModalOpen(true)
+      if (step.actionTrigger === 'open-whatsapp') setWhatsAppModalOpen(true)
+      if (step.actionTrigger === 'open-report-card') setReportCardModalOpen(true)
+    } else {
+      endTour()
+    }
+  }
+
+  const handleTourPrev = () => {
+    const prevIdx = Math.max(0, tourStep - 1)
+    const step = TOUR_STEPS[prevIdx]
+    setView(step.view)
+    prevTour()
+    if (step.actionTrigger === 'open-biometric') setBiometricModalOpen(true)
+    if (step.actionTrigger === 'open-whatsapp') setWhatsAppModalOpen(true)
+    if (step.actionTrigger === 'open-report-card') setReportCardModalOpen(true)
+  }
+
+  const handleTourJump = (idx: number) => {
+    const step = TOUR_STEPS[idx]
+    if (step) {
+      setView(step.view)
+      jumpToTourStep(idx, step.view)
+      if (step.actionTrigger === 'open-biometric') setBiometricModalOpen(true)
+      if (step.actionTrigger === 'open-whatsapp') setWhatsAppModalOpen(true)
+      if (step.actionTrigger === 'open-report-card') setReportCardModalOpen(true)
+    }
+  }
 
   return (
     <motion.div
@@ -139,6 +207,63 @@ export function DashboardShell() {
 
       <CommandPalette />
       <QuickActions />
+
+      {/* Sales Polish Modals & Overlays */}
+      <CelebrationBurst payload={celebrationPayload} onComplete={clearCelebration} />
+
+      <GuidedTour
+        active={tourActive}
+        stepIndex={tourStep}
+        onNext={handleTourNext}
+        onPrev={handleTourPrev}
+        onClose={endTour}
+        onJumpTo={handleTourJump}
+      />
+
+      <BiometricScanModal
+        open={biometricModalOpen}
+        onClose={() => setBiometricModalOpen(false)}
+        onPunched={(student) => {
+          pushToast({
+            tone: 'success',
+            title: 'Gate check-in recorded',
+            description: `${student} punched in safely at Gate 01. Attendance marked present.`,
+          })
+        }}
+      />
+
+      <WhatsAppReminderModal
+        open={whatsAppModalOpen}
+        onClose={() => setWhatsAppModalOpen(false)}
+        invoice={whatsAppInvoice}
+        isBatch={whatsAppIsBatch}
+        onSent={() => {
+          pushToast({
+            tone: 'success',
+            title: 'WhatsApp Reminder Dispatched',
+            description: 'Direct payment link and invoice summary delivered to parents.',
+          })
+        }}
+      />
+
+      <ReportCardModal
+        open={reportCardModalOpen}
+        onClose={() => setReportCardModalOpen(false)}
+        student={reportCardStudent}
+        aiRemark={reportCardRemark}
+      />
+
+      <TeacherChatModal
+        open={chatModalOpen}
+        onClose={() => setChatModalOpen(false)}
+        onSent={() => {
+          pushToast({
+            tone: 'info',
+            title: 'Message sent to Class Teacher',
+            description: 'Dr. Shalini Verma received your inquiry.',
+          })
+        }}
+      />
     </motion.div>
   )
 }

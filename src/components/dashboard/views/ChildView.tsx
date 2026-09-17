@@ -65,9 +65,39 @@ const TIMELINE = [
 ]
 
 export function ChildView() {
-  const { pushToast, invoices } = useApp()
+  const {
+    pushToast,
+    invoices,
+    setChatModalOpen,
+    setReportCardModalOpen,
+    setReportCardStudent,
+    setReportCardRemark,
+    triggerCelebration,
+  } = useApp()
   const invoice = invoices.find((i) => i.studentName === 'Aarav Mehta')
   const aggregate = SUBJECT_SCORES.reduce((a, b) => a + b.score, 0) / SUBJECT_SCORES.length
+
+  const handleOpenReportCard = () => {
+    setReportCardStudent({
+      name: WARD.name,
+      roll: WARD.roll,
+      classId: WARD.classId,
+      admissionNo: 'SVM-2018-0429',
+      guardian: WARD.guardian,
+      attendancePct: WARD.attendance,
+      house: WARD.house,
+    })
+    setReportCardRemark(
+      'Aarav demonstrates outstanding conceptual rigor in analytical disciplines, regularly topping mathematics and physics modules. Highly respectful, cooperative, and an active contributor to campus STEM initiatives. Promoted with High Distinction.',
+    )
+    setReportCardModalOpen(true)
+    triggerCelebration({ message: 'Mid-Term Progress Card Ready!' })
+    pushToast({
+      tone: 'success',
+      title: 'Progress card opened',
+      description: 'Official board-compliant grade sheet rendered for print/PDF export.',
+    })
+  }
 
   return (
     <div className="space-y-5">
@@ -91,15 +121,18 @@ export function ChildView() {
             size="sm"
             variant="outline"
             icon={<Download className="h-3.5 w-3.5" />}
-            onClick={() =>
-              pushToast({
-                tone: 'info',
-                title: 'Progress card queued',
-                description: 'Mid-term report PDF will be emailed within 5 minutes.',
-              })
-            }
+            onClick={handleOpenReportCard}
           >
             Download report card
+          </Button>
+          <Button
+            size="sm"
+            variant="primary"
+            icon={<MessageSquare className="h-3.5 w-3.5" />}
+            onClick={() => setChatModalOpen(true)}
+            className="bg-brand-600 hover:bg-brand-700 text-white"
+          >
+            Message Teacher
           </Button>
         </div>
       </div>
@@ -377,13 +410,17 @@ export function ChildView() {
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ y: -3 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() =>
-                  pushToast({
-                    tone: 'success',
-                    title: `Opening chat · ${c.label}`,
-                    description: `${c.value} typically replies within 2 hours.`,
-                  })
-                }
+                onClick={() => {
+                  if (c.label === 'Class teacher') {
+                    setChatModalOpen(true)
+                  } else {
+                    pushToast({
+                      tone: 'success',
+                      title: `Opening helpdesk · ${c.label}`,
+                      description: `${c.value} typically replies within 2 hours.`,
+                    })
+                  }
+                }}
                 className="surface lift rounded-2xl p-3.5 text-left hover:border-brand-300/70 dark:hover:border-brand-500/30"
               >
                 <p className="text-[10.5px] font-bold tracking-[0.1em] text-ink-400 uppercase">{c.label}</p>

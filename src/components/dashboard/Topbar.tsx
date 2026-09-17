@@ -3,24 +3,28 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   Bell,
   BadgeIndianRupee,
+  Building2,
   CalendarCheck2,
   Check,
   ChevronDown,
   GraduationCap,
   HelpCircle,
   LogOut,
+  MapPin,
   Menu,
   Moon,
   PanelsTopLeft,
+  Radio,
   Search,
   Settings,
   ShieldCheck,
+  Sparkles,
   Sun,
   UserCog,
   X,
 } from 'lucide-react'
 import { ROLES, useApp } from '../../state/store'
-import type { Role } from '../../data/school'
+import { CAMPUS_BRANCHES, type Role } from '../../data/school'
 import { cn } from '../../lib/utils'
 import { Pill } from '../ui/Badge'
 
@@ -46,6 +50,88 @@ const KIND_ICONS: Record<string, typeof Bell> = {
   exams: PanelsTopLeft,
   admissions: UserCog,
   transport: HelpCircle,
+}
+
+/* ------------------------------------------------------------------ */
+function CampusBranchSelector() {
+  const { campus, setCampus } = useApp()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [])
+
+  const current = CAMPUS_BRANCHES.find((b) => b.id === campus) || CAMPUS_BRANCHES[0]
+
+  return (
+    <div ref={ref} className="relative hidden xl:block">
+      <button
+        onClick={() => setOpen(!open)}
+        className="press flex h-10 items-center gap-2 rounded-xl border border-ink-200/80 bg-white/80 px-2.5 text-left text-ink-700 hover:border-ink-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-ink-200"
+      >
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
+          <Building2 className="h-3.5 w-3.5" />
+        </span>
+        <div className="leading-none text-left">
+          <span className="block text-[11px] font-bold text-ink-900 dark:text-white truncate max-w-[130px]">
+            {current.name.split('(')[0]}
+          </span>
+          <span className="block font-mono text-[9.5px] text-ink-400">{current.studentsCount} Students</span>
+        </div>
+        <ChevronDown className={cn('h-3 w-3 text-ink-400 transition-transform duration-200', open && 'rotate-180')} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            className="absolute left-0 z-[80] mt-2 w-72 rounded-2xl border border-ink-200/80 bg-white/98 p-1.5 shadow-xl backdrop-blur-2xl dark:border-white/12 dark:bg-ink-900/98"
+          >
+            <p className="px-3 py-1.5 text-[10px] font-bold tracking-wider text-ink-400 uppercase">
+              Multi-Branch Campus Switcher
+            </p>
+            {CAMPUS_BRANCHES.map((b) => {
+              const active = b.id === campus
+              return (
+                <button
+                  key={b.id}
+                  onClick={() => {
+                    setCampus(b.id)
+                    setOpen(false)
+                  }}
+                  className={cn(
+                    'press flex w-full items-start gap-2.5 rounded-xl px-3 py-2 text-left transition-colors',
+                    active ? 'bg-brand-50/80 dark:bg-white/10' : 'hover:bg-ink-50 dark:hover:bg-white/5',
+                  )}
+                >
+                  <MapPin className="h-3.5 w-3.5 mt-0.5 text-brand-600 shrink-0" />
+                  <div className="min-w-0 flex-1 text-[11.5px]">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-ink-900 dark:text-white">{b.name}</span>
+                      {active && <Check className="h-3 w-3 text-emerald-500" />}
+                    </div>
+                    <p className="text-[10px] text-ink-400">
+                      {b.location} · {b.grades}
+                    </p>
+                    <span className="font-mono text-[9.5px] text-brand-600 dark:text-brand-400">
+                      {b.studentsCount} Students · Head: {b.principal}
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
 }
 
 /* ------------------------------------------------------------------ */
@@ -263,7 +349,7 @@ function NotificationPanel() {
 
 /* ------------------------------------------------------------------ */
 export function Topbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
-  const { setPaletteOpen, theme, toggleTheme, setRoute, role, pushToast } = useApp()
+  const { setPaletteOpen, theme, toggleTheme, setRoute, role, pushToast, startTour, setBiometricModalOpen } = useApp()
   const [mobileSearch, setMobileSearch] = useState(false)
 
   return (
@@ -276,6 +362,8 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
         >
           <Menu className="h-4.5 w-4.5" />
         </button>
+
+        <CampusBranchSelector />
 
         <button
           onClick={() => setPaletteOpen(true)}
@@ -299,6 +387,25 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
         </button>
 
         <div className="ml-auto flex items-center gap-2">
+          {/* Sales Guided Walkthrough Button */}
+          <button
+            onClick={startTour}
+            className="press hidden sm:flex items-center gap-1.5 rounded-xl border border-brand-300 bg-brand-50/90 px-3 py-2 text-[12px] font-bold text-brand-700 shadow-2xs hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300 dark:hover:bg-brand-500/25"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+            <span>Take the Tour</span>
+          </button>
+
+          {/* Biometric RFID Gate Scan Simulation Button */}
+          <button
+            onClick={() => setBiometricModalOpen(true)}
+            title="Simulate Biometric / RFID Gate Scan"
+            className="press hidden md:flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50/90 px-2.5 py-2 text-[12px] font-bold text-emerald-700 shadow-2xs hover:bg-emerald-100 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300"
+          >
+            <Radio className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>SmartGate</span>
+          </button>
+
           <Pill tone="emerald" dot className="hidden sm:inline-flex">
             {role.scope}
           </Pill>

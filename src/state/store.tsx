@@ -151,6 +151,12 @@ export const ROLES: RoleProfile[] = [
   },
 ]
 
+export interface CelebrationPayload {
+  x?: number
+  y?: number
+  message?: string
+}
+
 export interface AppState {
   route: Route
   setRoute: (route: Route) => void
@@ -163,6 +169,38 @@ export interface AppState {
   toasts: Toast[]
   pushToast: (t: Omit<Toast, 'id'>) => void
   dismissToast: (id: string) => void
+  /* --- Campus / Branch selection --------------------------------- */
+  campus: string
+  setCampus: (campusId: string) => void
+  /* --- Guided sales tour ----------------------------------------- */
+  tourActive: boolean
+  tourStep: number
+  startTour: () => void
+  nextTour: () => void
+  prevTour: () => void
+  endTour: () => void
+  jumpToTourStep: (step: number, targetView?: ViewKey) => void
+  /* --- Celebration & confetti animation ------------------------- */
+  celebrationPayload: CelebrationPayload | null
+  triggerCelebration: (payload?: CelebrationPayload) => void
+  clearCelebration: () => void
+  /* --- Interactive sales modals ---------------------------------- */
+  biometricModalOpen: boolean
+  setBiometricModalOpen: (open: boolean) => void
+  whatsAppModalOpen: boolean
+  setWhatsAppModalOpen: (open: boolean) => void
+  whatsAppInvoice: FeeInvoice | null
+  setWhatsAppInvoice: (invoice: FeeInvoice | null) => void
+  whatsAppIsBatch: boolean
+  setWhatsAppIsBatch: (isBatch: boolean) => void
+  reportCardModalOpen: boolean
+  setReportCardModalOpen: (open: boolean) => void
+  reportCardStudent: any
+  setReportCardStudent: (student: any) => void
+  reportCardRemark: string
+  setReportCardRemark: (remark: string) => void
+  chatModalOpen: boolean
+  setChatModalOpen: (open: boolean) => void
   notifications: typeof NOTIFICATIONS
   unreadCount: number
   markNotificationsRead: () => void
@@ -300,6 +338,20 @@ export function AppProvider({
   const [substitutions, setSubstitutions] = useState(SUBSTITUTIONS)
   const timers = useRef<number[]>([])
 
+  /* --- Sales Pitch & Interactive Experience States --- */
+  const [campus, setCampusState] = useState<string>('main')
+  const [tourActive, setTourActive] = useState(false)
+  const [tourStep, setTourStep] = useState(0)
+  const [celebrationPayload, setCelebrationPayload] = useState<CelebrationPayload | null>(null)
+  const [biometricModalOpen, setBiometricModalOpen] = useState(false)
+  const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false)
+  const [whatsAppInvoice, setWhatsAppInvoice] = useState<FeeInvoice | null>(null)
+  const [whatsAppIsBatch, setWhatsAppIsBatch] = useState(false)
+  const [reportCardModalOpen, setReportCardModalOpen] = useState(false)
+  const [reportCardStudent, setReportCardStudent] = useState<any>(null)
+  const [reportCardRemark, setReportCardRemark] = useState<string>('')
+  const [chatModalOpen, setChatModalOpen] = useState(false)
+
   const role = useMemo(() => ROLES.find((r) => r.id === roleId) ?? ROLES[0], [roleId])
 
   useEffect(() => {
@@ -358,6 +410,54 @@ export function AppProvider({
     [pushToast],
   )
 
+  const triggerCelebration = useCallback((payload?: CelebrationPayload) => {
+    setCelebrationPayload(payload ?? { message: 'Action Confirmed!' })
+  }, [])
+
+  const clearCelebration = useCallback(() => {
+    setCelebrationPayload(null)
+  }, [])
+
+  const setCampus = useCallback(
+    (campusId: string) => {
+      setCampusState(campusId)
+      pushToast({
+        tone: 'info',
+        title: 'Branch switched',
+        description:
+          campusId === 'main'
+            ? 'Viewing Main Campus (Arera Colony · 1,420 students)'
+            : 'Viewing North Campus (Ayodhya Bypass · 680 students)',
+      })
+    },
+    [pushToast],
+  )
+
+  const startTour = useCallback(() => {
+    setTourActive(true)
+    setTourStep(0)
+    setViewState('overview')
+  }, [])
+
+  const endTour = useCallback(() => {
+    setTourActive(false)
+  }, [])
+
+  const jumpToTourStep = useCallback((step: number, targetView?: ViewKey) => {
+    setTourStep(step)
+    if (targetView) {
+      setViewState(targetView)
+    }
+  }, [])
+
+  const nextTour = useCallback(() => {
+    setTourStep((prev) => prev + 1)
+  }, [])
+
+  const prevTour = useCallback(() => {
+    setTourStep((prev) => Math.max(0, prev - 1))
+  }, [])
+
   // Global ⌘K / Ctrl+K palette trigger.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -394,22 +494,26 @@ export function AppProvider({
 
   const resetMarks = useCallback(() => setMarks({ ...SEED_MARKS }), [])
 
-  const recordPayment = useCallback((invoiceId: string, method: NonNullable<FeeInvoice['method']>, amount: number) => {
-    setInvoices((prev) =>
-      prev.map((inv) =>
-        inv.id === invoiceId
-          ? {
-              ...inv,
-              status: 'paid',
-              paidOn: new Date().toISOString().slice(0, 10),
-              method,
-              amount,
-              receiptNo: `RCPT/26/${Math.floor(9000 + Math.random() * 900)}`,
-            }
-          : inv,
-      ),
-    )
-  }, [])
+  const recordPayment = useCallback(
+    (invoiceId: string, method: NonNullable<FeeInvoice['method']>, amount: number) => {
+      setInvoices((prev) =>
+        prev.map((inv) =>
+          inv.id === invoiceId
+            ? {
+                ...inv,
+                status: 'paid',
+                paidOn: new Date().toISOString().slice(0, 10),
+                method,
+                amount,
+                receiptNo: `RCPT/26/${Math.floor(9000 + Math.random() * 900)}`,
+              }
+            : inv,
+        ),
+      )
+      triggerCelebration({ message: 'Fee Payment Recorded & Receipt Generated!' })
+    },
+    [triggerCelebration],
+  )
 
   const moveApplicant = useCallback((id: string, stage: Applicant['stage']) => {
     setApplicants((prev) => prev.map((a) => (a.id === id ? { ...a, stage } : a)))
@@ -443,26 +547,32 @@ export function AppProvider({
 
   const deleteNote = useCallback((id: string) => setNotes((prev) => prev.filter((n) => n.id !== id)), [])
 
-  const decideApproval = useCallback<AppState['decideApproval']>((id, decision, remark) => {
-    setApprovals((prev) => {
-      const target = prev.find((a) => a.id === id)
-      if (target) {
-        setDecisions((log) => [
-          {
-            id: uid(),
-            who: target.requester,
-            what: `${target.kind} ${decision}${target.amount ? ` · ₹${target.amount.toLocaleString('en-IN')}` : ''}`,
-            at: new Date().toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }),
-            decision,
-            kind: target.kind,
-            remark,
-          },
-          ...log,
-        ])
-      }
-      return prev.filter((a) => a.id !== id)
-    })
-  }, [])
+  const decideApproval = useCallback<AppState['decideApproval']>(
+    (id, decision, remark) => {
+      setApprovals((prev) => {
+        const target = prev.find((a) => a.id === id)
+        if (target) {
+          setDecisions((log) => [
+            {
+              id: uid(),
+              who: target.requester,
+              what: `${target.kind} ${decision}${target.amount ? ` · ₹${target.amount.toLocaleString('en-IN')}` : ''}`,
+              at: new Date().toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }),
+              decision,
+              kind: target.kind,
+              remark,
+            },
+            ...log,
+          ])
+        }
+        return prev.filter((a) => a.id !== id)
+      })
+      triggerCelebration({
+        message: decision === 'approved' ? 'Application Approved & Notified!' : 'Decision Recorded',
+      })
+    },
+    [triggerCelebration],
+  )
 
   const decideAllApprovals = useCallback<AppState['decideAllApprovals']>((decision) => {
     setApprovals((prev) => {
@@ -483,21 +593,25 @@ export function AppProvider({
     })
   }, [])
 
-  const publishNotice = useCallback<AppState['publishNotice']>((input) => {
-    const reach = input.audience.includes('Parents') ? 1363 : 1501
-    setNotices((prev) => [
-      {
-        id: uid('no'),
-        author: 'Office of the Principal',
-        when: 'Just now',
-        delivered: reach,
-        read: 0,
-        status: 'published',
-        ...input,
-      },
-      ...prev,
-    ])
-  }, [])
+  const publishNotice = useCallback<AppState['publishNotice']>(
+    (input) => {
+      const reach = input.audience.includes('Parents') ? 1363 : 1501
+      setNotices((prev) => [
+        {
+          id: uid('no'),
+          author: 'Office of the Principal',
+          when: 'Just now',
+          delivered: reach,
+          read: 0,
+          status: 'published',
+          ...input,
+        },
+        ...prev,
+      ])
+      triggerCelebration({ message: 'Circular Broadcasted to Campus!' })
+    },
+    [triggerCelebration],
+  )
 
   const deleteNotice = useCallback((id: string) => setNotices((prev) => prev.filter((n) => n.id !== id)), [])
 
@@ -581,6 +695,34 @@ export function AppProvider({
     staffOnLeaveCount: Object.values(staffDuty).filter((v) => v !== 'present').length,
     substitutions,
     confirmSubstitution,
+    campus,
+    setCampus,
+    tourActive,
+    tourStep,
+    startTour,
+    nextTour,
+    prevTour,
+    endTour,
+    jumpToTourStep,
+    celebrationPayload,
+    triggerCelebration,
+    clearCelebration,
+    biometricModalOpen,
+    setBiometricModalOpen,
+    whatsAppModalOpen,
+    setWhatsAppModalOpen,
+    whatsAppInvoice,
+    setWhatsAppInvoice,
+    whatsAppIsBatch,
+    setWhatsAppIsBatch,
+    reportCardModalOpen,
+    setReportCardModalOpen,
+    reportCardStudent,
+    setReportCardStudent,
+    reportCardRemark,
+    setReportCardRemark,
+    chatModalOpen,
+    setChatModalOpen,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

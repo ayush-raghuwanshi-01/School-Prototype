@@ -120,6 +120,40 @@ export const SCHOOL = {
   staff: 138,
 }
 
+export interface CampusBranch {
+  id: string
+  name: string
+  code: string
+  location: string
+  grades: string
+  studentsCount: number
+  staffCount: number
+  principal: string
+}
+
+export const CAMPUS_BRANCHES: CampusBranch[] = [
+  {
+    id: 'main',
+    name: 'Main Campus (Arera Colony)',
+    code: 'SVM-01',
+    location: 'Arera Colony, Bhopal',
+    grades: 'Pre-K to Grade 12',
+    studentsCount: 1420,
+    staffCount: 84,
+    principal: 'Dr. Sunita Sharma',
+  },
+  {
+    id: 'north',
+    name: 'North Campus (Ayodhya Bypass)',
+    code: 'SVM-02',
+    location: 'Ayodhya Bypass, Bhopal',
+    grades: 'Grade 1 to Grade 10',
+    studentsCount: 680,
+    staffCount: 42,
+    principal: 'Mr. Rajeshwar Rao',
+  },
+]
+
 export const PROGRAMS: Program[] = [
   {
     id: 'primary',

@@ -9,6 +9,7 @@ import {
   Clock,
   FileSpreadsheet,
   Percent,
+  Printer,
   RotateCcw,
   Sparkles,
   Target,
@@ -51,11 +52,36 @@ function scoreCellClass(score: number) {
 }
 
 export function ExamsView() {
-  const { marks, setMark, resetMarks, pushToast, role } = useApp()
+  const {
+    marks,
+    setMark,
+    resetMarks,
+    pushToast,
+    role,
+    setReportCardModalOpen,
+    setReportCardStudent,
+    setReportCardRemark,
+    triggerCelebration,
+  } = useApp()
   const [subjectId, setSubjectId] = useState<string>('all')
   const [simulating, setSimulating] = useState(false)
   const loading = useSimulatedLoad(subjectId, 620)
   const readOnly = role.id === 'parent'
+
+  const openStudentReportCard = (student: any, percent: number) => {
+    let remark = ''
+    if (percent >= 90) {
+      remark = `${student.name} demonstrates exemplary intellectual curiosity and conceptual mastery across STEM disciplines. An attentive scholar who leads classroom inquiry with humility and rigor. Promoted with Distinction.`
+    } else if (percent >= 75) {
+      remark = `${student.name} exhibits consistent progress in theoretical concepts. With dedicated revision in application problems and spoken debates, performance can readily attain the A1 band.`
+    } else {
+      remark = `${student.name} shows strong foundational promise but requires structured revision before final board examinations. Special mentoring sessions scheduled.`
+    }
+    setReportCardStudent(student)
+    setReportCardRemark(remark)
+    setReportCardModalOpen(true)
+    triggerCelebration({ message: `CBSE Grade Card generated for ${student.name}!` })
+  }
 
   const scored = useMemo(() => {
     const subjectRows = STUDENTS.map((s) => {
@@ -137,10 +163,55 @@ export function ExamsView() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
+          <Button
+            size="sm"
+            variant="outline"
+            icon={<Printer className="h-3.5 w-3.5 text-brand-600" />}
+            onClick={() => openStudentReportCard(STUDENTS[0], 92.4)}
+          >
+            Official CBSE Grade Sheet
+          </Button>
           <Pill tone="emerald" dot>
             {scored.passCount}/{STUDENTS.length} passing
           </Pill>
           <Pill tone="violet">{scored.distinction} distinctions</Pill>
+        </div>
+      </div>
+
+      {/* AI Report Card Comments Assistant Banner */}
+      <div className="rounded-2xl border border-brand-200/80 bg-gradient-to-r from-brand-50/80 via-white to-purple-50/60 p-4 shadow-xs dark:border-brand-500/20 dark:from-brand-950/30 dark:via-ink-900 dark:to-purple-950/20">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+              <Sparkles className="h-4.5 w-4.5" />
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-bold text-ink-900 dark:text-white">
+                  AI Pedagogical Remarks Assistant · Instant Teacher Comments
+                </span>
+                <Pill tone="emerald" dot>
+                  CBSE Rubric Compliant
+                </Pill>
+              </div>
+              <p className="mt-0.5 text-[12px] leading-relaxed text-ink-600 dark:text-ink-300">
+                Saves teachers up to 40 hours during term-end evaluation by synthesizing holistic, constructive comments
+                from marks and attendance data.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="primary"
+              className="bg-brand-600 hover:bg-brand-700 text-white shadow-sm"
+              icon={<Printer className="h-3.5 w-3.5" />}
+              onClick={() => openStudentReportCard(STUDENTS[0], 92.4)}
+            >
+              Generate Printable Board Card
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -429,6 +500,9 @@ export function ExamsView() {
                   <th className="px-3 py-3 text-center text-[10.5px] font-bold tracking-[0.12em] text-ink-400 uppercase">
                     Grade
                   </th>
+                  <th className="px-3 py-3 text-center text-[10.5px] font-bold tracking-[0.12em] text-ink-400 uppercase">
+                    Grade Sheet
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -509,6 +583,15 @@ export function ExamsView() {
                           </motion.span>
                         </AnimatePresence>
                       </td>
+                      <td className="px-3 py-2 text-center">
+                        <button
+                          onClick={() => openStudentReportCard(row.student, row.percent)}
+                          className="press inline-flex items-center gap-1 rounded-lg border border-brand-200 bg-brand-50/70 px-2 py-1 text-[11px] font-bold text-brand-700 hover:bg-brand-100 dark:border-brand-500/20 dark:bg-brand-500/15 dark:text-brand-300"
+                        >
+                          <Printer className="h-3 w-3" />
+                          <span>Report Card</span>
+                        </button>
+                      </td>
                     </motion.tr>
                   )
                 })}
@@ -551,6 +634,9 @@ export function ExamsView() {
                     >
                       {gradeFor(scored.classAverage)}
                     </span>
+                  </td>
+                  <td className="px-3 py-3 text-center text-[10.5px] font-bold text-ink-400">
+                    {scored.passCount} Passing
                   </td>
                 </tr>
               </tfoot>

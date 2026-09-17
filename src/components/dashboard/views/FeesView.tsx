@@ -8,9 +8,11 @@ import {
   CreditCard,
   Download,
   FileText,
+  MessageSquare,
   Receipt,
   Search,
   SlidersHorizontal,
+  Sparkles,
   TrendingUp,
   Wallet,
 } from 'lucide-react'
@@ -28,7 +30,8 @@ type Filter = 'all' | FeeStatus
 type SortKey = 'name' | 'amount' | 'dueDate'
 
 export function FeesView() {
-  const { invoices, recordPayment, pushToast, role } = useApp()
+  const { invoices, recordPayment, pushToast, role, setWhatsAppModalOpen, setWhatsAppInvoice, setWhatsAppIsBatch } =
+    useApp()
   const [filter, setFilter] = useState<Filter>('all')
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('name')
@@ -128,6 +131,19 @@ export function FeesView() {
           </Button>
           <Button
             size="sm"
+            variant="outline"
+            className="border-emerald-300 text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300"
+            icon={<MessageSquare className="h-3.5 w-3.5 text-emerald-600" />}
+            onClick={() => {
+              setWhatsAppInvoice(null)
+              setWhatsAppIsBatch(true)
+              setWhatsAppModalOpen(true)
+            }}
+          >
+            Broadcast WhatsApp Reminders
+          </Button>
+          <Button
+            size="sm"
             disabled={readOnly}
             icon={<Receipt className="h-3.5 w-3.5" />}
             onClick={() => {
@@ -136,6 +152,45 @@ export function FeesView() {
             }}
           >
             Record payment
+          </Button>
+        </div>
+      </div>
+
+      {/* AI Smart Fee Recovery Assistant Banner */}
+      <div className="rounded-2xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50/80 via-white to-brand-50/60 p-4 shadow-xs dark:border-emerald-500/20 dark:from-emerald-950/30 dark:via-ink-900 dark:to-brand-950/20">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+              <Sparkles className="h-4.5 w-4.5" />
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-bold text-ink-900 dark:text-white">
+                  Smart Fee Reminder Assistant · Automated WhatsApp UPI Links
+                </span>
+                <Pill tone="emerald" dot>
+                  94.2% Recovery Rate
+                </Pill>
+              </div>
+              <p className="mt-0.5 text-[12px] leading-relaxed text-ink-600 dark:text-ink-300">
+                Instead of awkward telephone calls, dispatch polite WhatsApp reminders with 1-click UPI links (GPay,
+                PhonePe, Paytm). Receipts and accounting entries reconcile instantly.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            size="sm"
+            variant="primary"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+            icon={<MessageSquare className="h-3.5 w-3.5" />}
+            onClick={() => {
+              setWhatsAppInvoice(null)
+              setWhatsAppIsBatch(true)
+              setWhatsAppModalOpen(true)
+            }}
+          >
+            Launch WhatsApp Fee Assistant ({inr(totals.overdue)})
           </Button>
         </div>
       </div>
@@ -389,6 +444,20 @@ export function FeesView() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {inv.status !== 'paid' && (
+                            <button
+                              onClick={() => {
+                                setWhatsAppInvoice(inv)
+                                setWhatsAppIsBatch(false)
+                                setWhatsAppModalOpen(true)
+                              }}
+                              title="Send Smart WhatsApp Reminder"
+                              className="press inline-flex h-8 items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50/80 px-2 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300"
+                            >
+                              <MessageSquare className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                              <span className="hidden sm:inline">WhatsApp</span>
+                            </button>
+                          )}
                           {inv.status === 'paid' ? (
                             <button
                               onClick={() => setDetail(inv)}

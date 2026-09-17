@@ -11,6 +11,8 @@ const LINKS = [
   { id: 'programs', label: 'Programs' },
   { id: 'campus', label: 'Campus' },
   { id: 'voices', label: 'Voices' },
+  { id: 'pricing', label: 'Pricing' },
+  { id: 'demo', label: 'Book Demo' },
   { id: 'admissions', label: 'Admissions' },
 ]
 
