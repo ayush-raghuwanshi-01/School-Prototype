@@ -63,17 +63,19 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         onClick={() => setRoute('portal')}
         className="press ring-focus flex items-center gap-2.5 rounded-2xl px-2 py-2 text-left transition-colors hover:bg-ink-100 dark:hover:bg-white/6"
       >
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-600 to-violet-accent-600 text-white shadow-[0_10px_24px_-10px_rgb(37_99_235_/_0.9)]">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-700 to-teal-800 text-white shadow-md">
           <GraduationCap className="h-5 w-5" />
         </span>
         <span className="leading-none">
           <span className="block text-[13.5px] leading-tight font-extrabold tracking-[-0.03em] text-ink-900 dark:text-white">
-            Saraswati Vidhya
+            Riverton Valley
           </span>
           <span className="block text-[13.5px] leading-tight font-extrabold tracking-[-0.03em] text-ink-900 dark:text-white">
-            Mandir
+            School · Bhopal
           </span>
-          <span className="block text-[9px] font-bold tracking-[0.2em] text-ink-400 uppercase">Management</span>
+          <span className="block text-[9px] font-bold tracking-[0.2em] text-emerald-700 uppercase">
+            CBSE Affiliated
+          </span>
         </span>
       </button>
 

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   BadgeIndianRupee,
@@ -29,6 +30,7 @@ const WARD = {
   guardian: 'Rakesh Mehta',
   attendance: 96.4,
   cgpa: 9.42,
+  scholarNo: 'RVS-2024-0429',
 }
 
 const SUBJECT_SCORES = SUBJECTS.map((s, i) => ({ ...s, score: [94, 88, 97, 91, 86, 92][i] ?? 88 }))
@@ -64,8 +66,18 @@ const TIMELINE = [
   },
 ]
 
+interface Assignment {
+  id: string
+  subject: string
+  title: string
+  due: string
+  status: 'Submitted' | 'Pending'
+  teacher: string
+}
+
 export function ChildView() {
   const {
+    role,
     pushToast,
     invoices,
     setChatModalOpen,
@@ -74,15 +86,86 @@ export function ChildView() {
     setReportCardRemark,
     triggerCelebration,
   } = useApp()
+
+  const [assignments, setAssignments] = useState<Assignment[]>([
+    {
+      id: 'as1',
+      subject: 'Physics',
+      title: 'Wave Optics: Huygens Principle Derivation & Practice Problems',
+      due: 'Tomorrow, 08:15 AM',
+      status: 'Submitted',
+      teacher: 'Dr. Shalini Verma',
+    },
+    {
+      id: 'as2',
+      subject: 'Chemistry',
+      title: 'Electrochemistry Titration Lab Journal Entry & Graphs',
+      due: 'Friday, 11:15 AM',
+      status: 'Pending',
+      teacher: 'Dr. Rohit Saxena',
+    },
+    {
+      id: 'as3',
+      subject: 'Mathematics',
+      title: 'Definite Integrals: Exercise 7.8 (Questions 1 to 15)',
+      due: '19 Sep, 09:10 AM',
+      status: 'Submitted',
+      teacher: 'Anil Deshpande',
+    },
+    {
+      id: 'as4',
+      subject: 'Computer Science',
+      title: 'Python-MySQL Connectivity: Class Roster Module Script',
+      due: '21 Sep, 02:00 PM',
+      status: 'Pending',
+      teacher: 'Amitabh Sen',
+    },
+    {
+      id: 'as5',
+      subject: 'English Core',
+      title: 'Speech Draft on "Digital Literacy in Secondary Education"',
+      due: '22 Sep, 12:10 PM',
+      status: 'Submitted',
+      teacher: 'Anand Chaturvedi',
+    },
+  ])
+
   const invoice = invoices.find((i) => i.studentName === 'Aarav Mehta')
   const aggregate = SUBJECT_SCORES.reduce((a, b) => a + b.score, 0) / SUBJECT_SCORES.length
+  const isStudent = role.id === 'student'
+
+  const toggleAssignment = (id: string) => {
+    setAssignments((prev) =>
+      prev.map((a) => {
+        if (a.id === id) {
+          const nextStatus = a.status === 'Submitted' ? 'Pending' : 'Submitted'
+          if (nextStatus === 'Submitted') {
+            triggerCelebration({ message: 'Assignment Submitted!' })
+            pushToast({
+              tone: 'success',
+              title: `Assignment marked as Submitted`,
+              description: `${a.subject}: ${a.title} · Sent to ${a.teacher}`,
+            })
+          } else {
+            pushToast({
+              tone: 'info',
+              title: 'Assignment marked as Pending',
+              description: 'Remember to submit before the deadline.',
+            })
+          }
+          return { ...a, status: nextStatus }
+        }
+        return a
+      }),
+    )
+  }
 
   const handleOpenReportCard = () => {
     setReportCardStudent({
       name: WARD.name,
       roll: WARD.roll,
       classId: WARD.classId,
-      admissionNo: 'SVM-2018-0429',
+      admissionNo: WARD.scholarNo,
       guardian: WARD.guardian,
       attendancePct: WARD.attendance,
       house: WARD.house,
@@ -95,7 +178,7 @@ export function ChildView() {
     pushToast({
       tone: 'success',
       title: 'Progress card opened',
-      description: 'Official board-compliant grade sheet rendered for print/PDF export.',
+      description: 'Official CBSE board-compliant grade sheet rendered for print/PDF export.',
     })
   }
 
@@ -103,13 +186,14 @@ export function ChildView() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Eyebrow>
-            <Sparkles className="h-3.5 w-3.5" /> Family view
+          <Eyebrow className="text-emerald-800 bg-emerald-50 border-emerald-200">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600" />{' '}
+            {isStudent ? 'Scholar Portal · Class XII-B' : 'Family view'}
           </Eyebrow>
-          <h1 className="mt-2.5 text-[clamp(1.6rem,3vw,2.15rem)] leading-tight font-extrabold tracking-[-0.04em] text-ink-900 dark:text-white">
-            Good afternoon, {WARD.guardian.split(' ')[0]}.
+          <h1 className="mt-2.5 text-[clamp(1.6rem,3vw,2.15rem)] leading-tight font-extrabold tracking-[-0.04em] text-slate-900">
+            Good afternoon, {isStudent ? 'Aarav' : WARD.guardian.split(' ')[0]}.
           </h1>
-          <p className="mt-1 text-[13.5px] text-ink-500 dark:text-ink-400">
+          <p className="mt-1 text-[13.5px] text-slate-500">
             Here is how {WARD.name.split(' ')[0]} is tracking this term. Everything below is read-only and synced live.
           </p>
         </div>
@@ -130,7 +214,7 @@ export function ChildView() {
             variant="primary"
             icon={<MessageSquare className="h-3.5 w-3.5" />}
             onClick={() => setChatModalOpen(true)}
-            className="bg-brand-600 hover:bg-brand-700 text-white"
+            className="bg-emerald-700 hover:bg-emerald-800 text-white"
           >
             Message Teacher
           </Button>
@@ -138,56 +222,126 @@ export function ChildView() {
       </div>
 
       {/* Hero card */}
-      <Card className="overflow-hidden border-brand-200/70 p-0 dark:border-brand-500/25">
-        <div className="bg-gradient-to-br from-brand-600 via-brand-600 to-violet-accent-600 p-5 sm:p-6">
+      <Card className="overflow-hidden border-emerald-200/80 p-0 shadow-sm">
+        <div className="bg-gradient-to-br from-emerald-700 via-emerald-800 to-teal-900 p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-4">
             <Avatar name={WARD.name} size={64} className="ring-4 ring-white/25" />
             <div className="min-w-0 flex-1">
               <p className="text-[20px] font-extrabold tracking-[-0.03em] text-white">{WARD.name}</p>
-              <p className="text-[12.5px] text-white/75">
-                Class {WARD.classId} · Roll {WARD.roll} · {WARD.house} house · Science stream
+              <p className="text-[12.5px] text-emerald-100">
+                Class {WARD.classId} · Roll {WARD.roll} · Scholar {WARD.scholarNo} · {WARD.house} house · Science PCM
               </p>
             </div>
             <div className="flex gap-6">
               <div className="text-right">
-                <p className="text-[11px] font-semibold text-white/70">Attendance</p>
+                <p className="text-[11px] font-semibold text-emerald-200">Attendance</p>
                 <p className="text-[20px] font-extrabold tabular text-white">{WARD.attendance}%</p>
               </div>
               <div className="text-right">
-                <p className="text-[11px] font-semibold text-white/70">CGPA</p>
+                <p className="text-[11px] font-semibold text-emerald-200">CGPA</p>
                 <p className="text-[20px] font-extrabold tabular text-white">{WARD.cgpa.toFixed(2)}</p>
               </div>
             </div>
           </div>
         </div>
-        <div className="grid gap-4 p-5 sm:grid-cols-3">
+        <div className="grid gap-4 p-5 sm:grid-cols-3 bg-white">
           {[
-            { label: 'Today’s status', value: 'Present · 08:07 am', tone: 'emerald' as Tone, icon: CalendarCheck2 },
-            { label: 'Next examination', value: 'Chemistry · 18 Sep', tone: 'brand' as Tone, icon: Clock },
-            { label: 'Transport', value: 'Route 7 · bus 12', tone: 'violet' as Tone, icon: Bus },
+            {
+              label: 'Today’s status',
+              value: 'Present · 08:07 am (Gate RFID 01)',
+              tone: 'emerald' as Tone,
+              icon: CalendarCheck2,
+            },
+            { label: 'Next examination', value: 'Physics Optics · 18 Sep', tone: 'brand' as Tone, icon: Clock },
+            { label: 'Transport', value: 'Route 3 · Arera Colony (Bus 15)', tone: 'violet' as Tone, icon: Bus },
           ].map((row) => (
-            <div
-              key={row.label}
-              className="flex items-center gap-3 rounded-2xl border border-ink-200/70 px-3.5 py-3 dark:border-white/8"
-            >
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-ink-100 text-ink-500 dark:bg-white/8 dark:text-ink-300">
+            <div key={row.label} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3.5 py-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700">
                 <row.icon className="h-4 w-4" />
               </span>
               <div className="min-w-0">
-                <p className="text-[10.5px] font-bold tracking-[0.1em] text-ink-400 uppercase">{row.label}</p>
-                <p className="truncate text-[12.5px] font-bold text-ink-900 dark:text-white">{row.value}</p>
+                <p className="text-[10.5px] font-bold tracking-[0.1em] text-slate-400 uppercase">{row.label}</p>
+                <p className="truncate text-[12.5px] font-bold text-slate-900">{row.value}</p>
               </div>
             </div>
           ))}
         </div>
       </Card>
 
+      {/* Student Daily Assignments & Homework Dispatcher (Working Prototype Feature) */}
+      <Card className="p-5 border-slate-200 shadow-sm bg-white">
+        <CardHeader
+          compact
+          title="Daily Assignments & Practical Journal Tracker"
+          subtitle="CBSE Class XII-B Science · Click any assignment to submit or review status"
+          right={
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-extrabold text-emerald-800 border border-emerald-200">
+              {assignments.filter((a) => a.status === 'Submitted').length} of {assignments.length} Completed
+            </span>
+          }
+        />
+        <div className="space-y-2.5 mt-2">
+          {assignments.map((item) => {
+            const isDone = item.status === 'Submitted'
+            return (
+              <div
+                key={item.id}
+                className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3.5 transition-all ${
+                  isDone
+                    ? 'border-emerald-200 bg-emerald-50/40'
+                    : 'border-slate-200 bg-slate-50/50 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <button
+                    onClick={() => toggleAssignment(item.id)}
+                    className={`mt-0.5 grid h-6 w-6 place-items-center rounded-lg border transition-all ${
+                      isDone
+                        ? 'border-emerald-600 bg-emerald-600 text-white'
+                        : 'border-slate-300 bg-white hover:border-emerald-500'
+                    }`}
+                  >
+                    {isDone && <CheckCircle2 className="h-4 w-4" />}
+                  </button>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-700">
+                        {item.subject}
+                      </span>
+                      <span className={`text-[13px] font-bold ${isDone ? 'text-slate-800' : 'text-slate-900'}`}>
+                        {item.title}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      Assigned by <strong className="text-slate-700">{item.teacher}</strong> · Due: {item.due}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleAssignment(item.id)}
+                    className={`press rounded-xl px-3 py-1.5 text-[11px] font-bold transition-colors ${
+                      isDone
+                        ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                        : 'bg-emerald-700 text-white hover:bg-emerald-800 shadow-xs'
+                    }`}
+                  >
+                    {isDone ? 'Submitted ✓' : 'Mark as Submitted'}
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </Card>
+
       <div className="grid gap-5 xl:grid-cols-[1.25fr_1fr]">
-        <Card className="p-5">
+        <Card className="p-5 border-slate-200 bg-white">
           <CardHeader
             compact
             title="Subject performance · mid-term"
-            subtitle="Maximum marks 100 · MPBSE grading scale"
+            subtitle="Maximum marks 100 · CBSE grading scale"
             right={<Pill tone="emerald">{gradeFor(aggregate)}</Pill>}
           />
           <div className="space-y-3.5">
@@ -199,12 +353,12 @@ export function ChildView() {
                 transition={{ delay: i * 0.06 }}
               >
                 <div className="flex items-center justify-between text-[12.5px]">
-                  <span className="flex items-center gap-2 font-semibold text-ink-700 dark:text-ink-200">
-                    <BookOpen className="h-3.5 w-3.5 text-ink-400" />
+                  <span className="flex items-center gap-2 font-semibold text-slate-700">
+                    <BookOpen className="h-3.5 w-3.5 text-slate-400" />
                     {s.name}
                   </span>
-                  <span className="font-bold tabular text-ink-900 dark:text-white">
-                    {s.score}/100 <span className="text-ink-400">· {gradeFor(s.score)}</span>
+                  <span className="font-bold tabular text-slate-900">
+                    {s.score}/100 <span className="text-slate-400">· {gradeFor(s.score)}</span>
                   </span>
                 </div>
                 <ProgressBar
@@ -212,13 +366,13 @@ export function ChildView() {
                   tone={s.score >= 90 ? 'emerald' : s.score >= 80 ? 'brand' : 'amber'}
                   className="mt-1.5"
                 />
-                <p className="mt-1 text-[10.5px] text-ink-400">{s.teacher} · section average 78.4</p>
+                <p className="mt-1 text-[10.5px] text-slate-500">{s.teacher} · section average 78.4</p>
               </motion.div>
             ))}
           </div>
-          <div className="mt-5 flex items-center justify-between rounded-2xl bg-ink-900 p-4 text-white dark:bg-brand-600">
+          <div className="mt-5 flex items-center justify-between rounded-2xl bg-emerald-900 p-4 text-white">
             <div>
-              <p className="text-[11.5px] font-semibold text-white/70">Term aggregate</p>
+              <p className="text-[11.5px] font-semibold text-emerald-200">Term aggregate</p>
               <p className="text-[22px] font-extrabold tabular">{aggregate.toFixed(1)}%</p>
             </div>
             <Pill tone="emerald" className="border-white/20 bg-white/15 text-white">
@@ -228,23 +382,23 @@ export function ChildView() {
         </Card>
 
         <div className="space-y-5">
-          <Card className="p-5">
+          <Card className="p-5 border-slate-200 bg-white">
             <CardHeader
               compact
               title="Fees"
               subtitle="Term 2 · session 2026-27"
-              right={<BadgeIndianRupee className="h-4 w-4 text-emerald-500" />}
+              right={<BadgeIndianRupee className="h-4 w-4 text-emerald-600" />}
             />
-            <div className="rounded-2xl border border-ink-200/70 p-4 dark:border-white/8">
+            <div className="rounded-2xl border border-slate-200 p-4 bg-slate-50/50">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-[11px] font-bold tracking-[0.12em] text-ink-400 uppercase">
+                  <p className="text-[11px] font-bold tracking-[0.12em] text-slate-400 uppercase">
                     {invoice?.term ?? 'Term 2 · 2026-27'}
                   </p>
-                  <p className="mt-1 text-[22px] font-extrabold tracking-[-0.04em] tabular text-ink-900 dark:text-white">
+                  <p className="mt-1 text-[22px] font-extrabold tracking-[-0.04em] tabular text-slate-900">
                     {inr(invoice?.amount ?? 124000)}
                   </p>
-                  <p className="text-[11.5px] text-ink-500 dark:text-ink-400">
+                  <p className="text-[11.5px] text-slate-500">
                     Paid {invoice?.paidOn ?? '2026-09-08'} · {invoice?.method ?? 'UPI'}
                   </p>
                 </div>
@@ -252,9 +406,9 @@ export function ChildView() {
                   Settled
                 </Pill>
               </div>
-              <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50/80 px-3 py-2 dark:bg-emerald-500/10">
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                <p className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-200">
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 border border-emerald-100">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                <p className="text-[11px] font-semibold text-emerald-800">
                   Receipt {invoice?.receiptNo ?? 'RCPT/26/8241'} issued
                 </p>
               </div>
@@ -285,22 +439,25 @@ export function ChildView() {
             </div>
           </Card>
 
-          <Card className="p-5">
+          <Card className="p-5 border-slate-200 bg-white">
             <CardHeader
               compact
               title="This week"
               subtitle="Class XII-B timetable"
-              right={<Bell className="h-4 w-4 text-brand-500" />}
+              right={<Bell className="h-4 w-4 text-emerald-600" />}
             />
             <div className="overflow-x-auto">
               <table className="w-full min-w-[420px] border-collapse text-[11px]">
                 <thead>
                   <tr>
-                    <th className="px-1.5 py-1.5 text-left text-[10px] font-bold tracking-[0.1em] text-ink-400 uppercase">
+                    <th className="px-1.5 py-1.5 text-left text-[10px] font-bold tracking-[0.1em] text-slate-400 uppercase">
                       Day
                     </th>
                     {TIMETABLE_SLOTS.slice(0, 6).map((s) => (
-                      <th key={s} className="px-1 py-1.5 text-center font-mono text-[9.5px] font-semibold text-ink-400">
+                      <th
+                        key={s}
+                        className="px-1 py-1.5 text-center font-mono text-[9.5px] font-semibold text-slate-400"
+                      >
                         {s}
                       </th>
                     ))}
@@ -308,16 +465,14 @@ export function ChildView() {
                 </thead>
                 <tbody>
                   {TIMETABLE_DAYS.map((day) => (
-                    <tr key={day} className="border-t border-ink-100 dark:border-white/5">
-                      <td className="px-1.5 py-1.5 text-[11px] font-bold text-ink-700 dark:text-ink-200">{day}</td>
+                    <tr key={day} className="border-t border-slate-100">
+                      <td className="px-1.5 py-1.5 text-[11px] font-bold text-slate-700">{day}</td>
                       {TIMETABLE[day].slice(0, 6).map((slot, i) => (
                         <td key={`${day}-${i}`} className="px-0.5 py-1">
                           <span
                             className={cn(
                               'block truncate rounded-lg px-1.5 py-1 text-center text-[9.5px] font-semibold',
-                              slot.startsWith('—')
-                                ? 'text-ink-300 dark:text-ink-600'
-                                : 'bg-ink-100 text-ink-600 dark:bg-white/8 dark:text-ink-300',
+                              slot.startsWith('—') ? 'text-slate-300' : 'bg-slate-100 text-slate-700',
                             )}
                             title={slot}
                           >
@@ -335,15 +490,15 @@ export function ChildView() {
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[1fr_1fr]">
-        <Card className="p-5">
+        <Card className="p-5 border-slate-200 bg-white">
           <CardHeader
             compact
             title="Recent updates"
             subtitle="Everything the school shared with you"
-            right={<TrendingUp className="h-4 w-4 text-violet-accent-500" />}
+            right={<TrendingUp className="h-4 w-4 text-emerald-600" />}
           />
           <div className="relative space-y-4 pl-1.5">
-            <span className="absolute top-2 bottom-4 left-[7px] w-px bg-ink-200 dark:bg-white/10" />
+            <span className="absolute top-2 bottom-4 left-[7px] w-px bg-slate-200" />
             {TIMELINE.map((t, i) => (
               <motion.div
                 key={t.id}
@@ -354,32 +509,32 @@ export function ChildView() {
               >
                 <span
                   className={cn(
-                    'relative z-10 mt-1 h-3.5 w-3.5 shrink-0 rounded-full ring-4 ring-white dark:ring-ink-900',
+                    'relative z-10 mt-1 h-3.5 w-3.5 shrink-0 rounded-full ring-4 ring-white',
                     t.tone === 'emerald'
                       ? 'bg-emerald-500'
                       : t.tone === 'brand'
-                        ? 'bg-brand-600'
+                        ? 'bg-blue-600'
                         : t.tone === 'violet'
-                          ? 'bg-violet-accent-600'
+                          ? 'bg-purple-600'
                           : 'bg-amber-500',
                   )}
                 />
                 <div>
-                  <p className="text-[12.5px] font-bold tracking-[-0.01em] text-ink-900 dark:text-white">{t.title}</p>
-                  <p className="text-[11.5px] text-ink-500 dark:text-ink-400">{t.detail}</p>
-                  <p className="mt-0.5 font-mono text-[10.5px] text-ink-400">{t.at}</p>
+                  <p className="text-[12.5px] font-bold tracking-[-0.01em] text-slate-900">{t.title}</p>
+                  <p className="text-[11.5px] text-slate-500">{t.detail}</p>
+                  <p className="mt-0.5 font-mono text-[10.5px] text-slate-400">{t.at}</p>
                 </div>
               </motion.div>
             ))}
           </div>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-5 border-slate-200 bg-white">
           <CardHeader
             compact
             title="Reach the school"
             subtitle="Response guaranteed within one working day"
-            right={<MessageSquare className="h-4 w-4 text-brand-500" />}
+            right={<MessageSquare className="h-4 w-4 text-emerald-600" />}
           />
           <div className="grid gap-2.5 sm:grid-cols-2">
             {[
@@ -391,15 +546,15 @@ export function ChildView() {
               },
               {
                 label: 'Front office',
-                value: '+91 124 402 8800',
-                sub: 'Mon–Sat, 8 am – 4:30 pm',
+                value: '+91 78699 66422',
+                sub: 'Bilkhiriya Campus, Bhopal',
                 tone: 'emerald' as Tone,
               },
-              { label: 'Fee helpdesk', value: 'accounts@svmbhopal…', sub: 'Priya Menon', tone: 'amber' as Tone },
+              { label: 'Fee helpdesk', value: 'accounts@rivertonvalley…', sub: 'Priya Menon', tone: 'amber' as Tone },
               {
                 label: 'Transport cell',
-                value: 'Route 7 control',
-                sub: 'Live tracking in app',
+                value: 'Route 3 (Arera/MP Nagar)',
+                sub: 'Bus 15 · Live GPS tracking',
                 tone: 'violet' as Tone,
               },
             ].map((c, i) => (
@@ -421,21 +576,21 @@ export function ChildView() {
                     })
                   }
                 }}
-                className="surface lift rounded-2xl p-3.5 text-left hover:border-brand-300/70 dark:hover:border-brand-500/30"
+                className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5 text-left hover:border-emerald-500 hover:bg-white transition-all shadow-2xs"
               >
-                <p className="text-[10.5px] font-bold tracking-[0.1em] text-ink-400 uppercase">{c.label}</p>
-                <p className="mt-1 truncate text-[12.5px] font-bold text-ink-900 dark:text-white">{c.value}</p>
-                <p className="truncate text-[11px] text-ink-500 dark:text-ink-400">{c.sub}</p>
+                <p className="text-[10.5px] font-bold tracking-[0.1em] text-slate-400 uppercase">{c.label}</p>
+                <p className="mt-1 truncate text-[12.5px] font-bold text-slate-900">{c.value}</p>
+                <p className="truncate text-[11px] text-slate-500">{c.sub}</p>
               </motion.button>
             ))}
           </div>
           <Button
-            className="mt-4 w-full"
+            className="mt-4 w-full bg-emerald-700 hover:bg-emerald-800 text-white"
             onClick={() =>
               pushToast({
                 tone: 'success',
                 title: 'Leave application drafted',
-                description: 'Ready to submit for 22–23 September.',
+                description: 'Ready to submit for 22–23 September to Dr. Shalini Verma.',
               })
             }
           >
@@ -450,10 +605,10 @@ export function ChildView() {
             label: 'Attendance this term',
             value: `${WARD.attendance}%`,
             tone: 'emerald',
-            sub: 'Above the 75% MPBSE norm',
+            sub: 'Above the 75% CBSE norm',
           },
           { label: 'Assignments submitted', value: '41 / 42', tone: 'brand', sub: '1 pending · Chemistry lab record' },
-          { label: 'Co-curricular', value: 'Basketball · MUN', tone: 'violet', sub: 'District squad selected' },
+          { label: 'Co-curricular', value: 'Basketball · MUN', tone: 'violet', sub: 'Bhopal Sahodaya squad' },
           { label: 'Mentor meetings', value: '6 of 6', tone: 'amber', sub: 'Monthly cadence maintained' },
         ]}
       />

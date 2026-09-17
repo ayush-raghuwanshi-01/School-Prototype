@@ -212,6 +212,91 @@ export function OverviewView() {
         </div>
       </div>
 
+      {/* ---------------- Dedicated Faculty Cockpit when logged in as Teacher ---------------- */}
+      {role.id === 'teacher' && (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50/50 p-5 shadow-sm space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-200/70 pb-3">
+            <div className="flex items-center gap-3">
+              <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-700 text-white font-bold text-sm">
+                XII-B
+              </span>
+              <div>
+                <h3 className="text-[15px] font-extrabold text-slate-900">Faculty Workspace · Dr. Shalini Verma</h3>
+                <p className="text-[11.5px] text-emerald-800 font-medium">
+                  Class Teacher XII-B (Science PCM) & Head of Science Department
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                size="sm"
+                className="bg-emerald-700 text-white hover:bg-emerald-800"
+                onClick={() => {
+                  setView('attendance')
+                  pushToast({
+                    tone: 'success',
+                    title: 'Class XII-B Attendance Register',
+                    description: 'Opened homeroom register · 24 scholars enrolled.',
+                  })
+                }}
+              >
+                Take XII-B Attendance
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setView('exams')
+                  pushToast({
+                    tone: 'info',
+                    title: 'Physics Mid-Term Marks Matrix',
+                    description: '20 of 24 answer scripts evaluated.',
+                  })
+                }}
+              >
+                Enter Exam Marks
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  pushToast({
+                    tone: 'success',
+                    title: 'Homework Dispatched to Class XII-B',
+                    description: 'Ray Optics derivation assigned to 24 students via portal.',
+                  })
+                }}
+              >
+                Dispatch Homework
+              </Button>
+            </div>
+          </div>
+
+          {/* Today's Teaching Schedule */}
+          <div>
+            <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-2">
+              My Teaching Schedule Today (5 Periods)
+            </p>
+            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+              {[
+                { time: '08:15 – 09:00', class: 'Class XII-B', topic: 'Physics (Optics)', room: 'Room 204' },
+                { time: '10:05 – 10:50', class: 'Class XI-A', topic: 'Physics (Mechanics)', room: 'Room 108' },
+                { time: '11:15 – 12:45', class: 'Class XII-B', topic: 'Optics Practical Lab', room: 'Lab 3' },
+                { time: '01:40 – 02:25', class: 'Class IX-A', topic: 'General Science', room: 'Room 302' },
+                { time: '02:35 – 03:15', class: 'Doubt Clinic', topic: 'Remedial Science', room: 'Lab 3' },
+              ].map((period, i) => (
+                <div key={i} className="rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-2xs">
+                  <span className="font-mono text-[10px] font-bold text-emerald-700">{period.time}</span>
+                  <p className="text-[12px] font-extrabold text-slate-900 mt-0.5">{period.class}</p>
+                  <p className="text-[11px] text-slate-600 truncate">{period.topic}</p>
+                  <span className="text-[10px] text-slate-400 font-medium">{period.room}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ---------------- Value / ROI Strip (Executive Proof) ---------------- */}
       <RoiStrip />
 

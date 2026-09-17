@@ -96,18 +96,18 @@ export function ReportCardModal({
           {/* Header Banner */}
           <div className="border-b-2 border-ink-800 pb-3 text-center">
             <div className="flex items-center justify-center gap-3">
-              <div className="grid h-14 w-14 place-items-center rounded-full border-2 border-ink-900 bg-brand-50 font-black text-brand-800 text-lg">
-                SVM
+              <div className="grid h-14 w-14 place-items-center rounded-full border-2 border-emerald-900 bg-emerald-50 font-black text-emerald-800 text-lg">
+                RVS
               </div>
               <div>
-                <h1 className="text-[18px] font-black uppercase tracking-wider text-ink-950">
-                  SARASWATI VIDHYA MANDIR HR SEC SCHOOL
+                <h1 className="text-[18px] font-black uppercase tracking-wider text-slate-950">
+                  RIVERTON VALLEY SCHOOL, BHOPAL
                 </h1>
-                <p className="text-[11px] font-bold text-ink-600">
-                  Affiliated to MP Board of Secondary Education & CBSE Curriculum Norms
+                <p className="text-[11px] font-bold text-emerald-800">
+                  CBSE Affiliated · Affiliation No. 1031461 · School Code: 50924
                 </p>
-                <p className="text-[10px] text-ink-500">
-                  Arera Colony, Bhopal, Madhya Pradesh 462010 · Affiliation No. 1030142 · School Code: 50118
+                <p className="text-[10px] text-slate-500">
+                  15-Acre Nature Campus, Bilkhiriya, Raisen Road, Bhopal, MP 462022 · AKS Educational Society
                 </p>
               </div>
             </div>
@@ -244,14 +244,14 @@ export function ReportCardModal({
 
               {/* Official Seal Mockup */}
               <div className="flex flex-col items-center">
-                <div className="relative grid h-16 w-16 place-items-center rounded-full border-2 border-dashed border-red-700 text-red-700 text-[8px] font-bold uppercase rotate-[-8deg] p-1">
+                <div className="relative grid h-16 w-16 place-items-center rounded-full border-2 border-dashed border-emerald-800 text-emerald-800 text-[8px] font-bold uppercase rotate-[-8deg] p-1">
                   <div className="text-center leading-tight">
-                    <span>★ SVM ★</span>
+                    <span>★ RVS ★</span>
                     <span className="block text-[7px]">EXAM CELL</span>
                     <span>VERIFIED</span>
                   </div>
                 </div>
-                <p className="text-[9px] text-ink-400 font-mono mt-1">Ref: REP/2026/8941</p>
+                <p className="text-[9px] text-ink-400 font-mono mt-1">Ref: RVS/2026/8941</p>
               </div>
 
               <div>

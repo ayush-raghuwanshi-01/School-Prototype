@@ -33,21 +33,21 @@ export function PortalFooter() {
         <div className="grid gap-12 lg:grid-cols-[1.4fr_2fr]">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-600 to-violet-accent-600 text-white">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-emerald-700 to-teal-800 text-white shadow-sm">
                 <GraduationCap className="h-5 w-5" />
               </span>
               <span className="leading-none">
-                <span className="block text-[15px] font-extrabold tracking-[-0.03em] text-ink-900 dark:text-white">
-                  Saraswati Vidhya Mandir
+                <span className="block text-[15px] font-extrabold tracking-[-0.03em] text-slate-900">
+                  Riverton Valley School
                 </span>
-                <span className="block text-[9.5px] font-bold tracking-[0.2em] text-ink-400 uppercase">
-                  Estd. {SCHOOL.estd} · MPBSE
+                <span className="block text-[9.5px] font-bold tracking-[0.2em] text-emerald-700 uppercase">
+                  CBSE Affiliated · Bhopal
                 </span>
               </span>
             </div>
-            <p className="mt-5 max-w-sm text-[13px] leading-relaxed text-ink-600 dark:text-ink-300">
+            <p className="mt-5 max-w-sm text-[13px] leading-relaxed text-slate-600">
               {SCHOOL.tagline} An institution built on measurable transparency — for students, parents and the faculty
-              who teach them.
+              who teach them. Managed by AKS Educational Society Bhopal.
             </p>
 
             <div className="mt-6 space-y-2.5 text-[12.5px] text-ink-600 dark:text-ink-300">
@@ -140,10 +140,10 @@ export function PortalFooter() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-ink-200/70 pt-7 sm:flex-row dark:border-white/8">
-          <p className="text-[11.5px] text-ink-400">
-            © 2026 Saraswati Vidhya Mandir Samiti. {SCHOOL.affiliation}. All rights reserved.
+          <p className="text-[11.5px] text-slate-500">
+            © 2026 Riverton Valley School · AKS Educational Society Bhopal. {SCHOOL.affiliation}. All rights reserved.
           </p>
-          <div className="flex items-center gap-5 text-[11.5px] text-ink-400">
+          <div className="flex items-center gap-5 text-[11.5px] text-slate-500">
             <a
               href="#"
               onClick={(e) => e.preventDefault()}

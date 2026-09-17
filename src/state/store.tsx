@@ -149,6 +149,17 @@ export const ROLES: RoleProfile[] = [
     defaultView: 'child',
     accent: 'rose',
   },
+  {
+    id: 'student',
+    label: 'Student Portal',
+    person: 'Aarav Sharma',
+    designation: 'Scholar · Class XII-B (Science PCM + CS)',
+    scope: 'Aarav Sharma · Scholar No. RVS-2024-0429',
+    description: 'My academic grades, CBSE report card, timetable, assignments, and faculty chat.',
+    views: ['child', 'exams', 'notices'],
+    defaultView: 'child',
+    accent: 'emerald',
+  },
 ]
 
 export interface CelebrationPayload {

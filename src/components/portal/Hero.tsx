@@ -13,13 +13,13 @@ const STATS = [
 ]
 
 const MARQUEE = [
-  'Affiliated to MPBSE · Recognition No. MP/2134',
-  'Ranked #2 in Bhopal — EducationWorld India 2026',
-  'Saraswati Vidya Parishad partner school',
-  '100% board pass rate, 9 years running',
-  'State Yoga Championship — gold, 2025',
-  'Hindi & English medium campus',
-  'Kanya Shiksha scholarship programme',
+  'CBSE Affiliated · Affiliation No. 1031461 · School Code: 50924',
+  'AKS Educational Society · 15-Acre Nature Campus Bhopal',
+  'Ranked Among Top CBSE Schools in Bhopal — 2026',
+  '100% CBSE Board Pass Rate with Distinctions',
+  'Bhopal Sahodaya Complex Member School',
+  'Integrated JEE, NEET & CUET Guidance',
+  'English Medium Co-educational with Indian Sanskar',
 ]
 
 export function Hero() {
@@ -90,10 +90,11 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.3 }}
-            className="mt-6 max-w-xl text-[16.5px] leading-[1.65] text-balance text-ink-600 dark:text-ink-300"
+            className="mt-6 max-w-xl text-[16.5px] leading-[1.65] text-balance text-slate-600"
           >
-            Four acres off Kolar Road, Bhopal. An MPBSE curriculum with integrated JEE, NEET, NDA and CUET guidance. And
-            a management system that shows every parent, teacher and trustee exactly what is happening — in real time.
+            Fifteen acres in Bilkhiriya, Bhopal. A CBSE curriculum (Affiliation No. 1031461) with integrated JEE, NEET,
+            NDA and CUET guidance. And a management system that shows every parent, teacher and trustee exactly what is
+            happening — in real time.
           </motion.p>
 
           <motion.div

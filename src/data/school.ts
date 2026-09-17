@@ -3,7 +3,7 @@ import { mulberry32 } from '../lib/utils'
 /* ------------------------------------------------------------------ *
  * Domain types
  * ------------------------------------------------------------------ */
-export type Role = 'admin' | 'principal' | 'teacher' | 'accountant' | 'parent'
+export type Role = 'admin' | 'principal' | 'teacher' | 'accountant' | 'parent' | 'student'
 export type FeeStatus = 'paid' | 'pending' | 'overdue'
 export type AttendanceMark = 'present' | 'absent' | 'late'
 
@@ -101,23 +101,24 @@ export interface Testimonial {
  * Public portal content
  * ------------------------------------------------------------------ */
 export const SCHOOL = {
-  name: 'Saraswati Vidhya Mandir Hr Sec School',
-  shortName: 'Saraswati Vidhya Mandir',
-  abbr: 'SVM',
-  tagline: 'Shiksha · Sanskar · Samriddhi',
-  affiliation: 'Affiliated to MPBSE · Recognition No. MP/2134',
-  board: 'MP Board (MPBSE)',
-  medium: 'Hindi & English medium',
-  estd: 1994,
-  campus: 'Saraswati Vidhya Mandir Campus, Bhopal, Madhya Pradesh 462010',
+  name: 'Riverton Valley School Bhopal',
+  shortName: 'Riverton Valley',
+  abbr: 'RVS',
+  tagline: 'Rooted in Nature · Rising to the Future',
+  affiliation: 'CBSE Affiliated · Affiliation No. 1031461 · School Code: 50924',
+  board: 'Central Board of Secondary Education (CBSE)',
+  medium: 'English Medium Co-educational',
+  estd: 2018,
+  campus: '15-Acre Nature Campus, Bilkhiriya, Raisen Road, Bhopal, MP 462022',
   city: 'Bhopal',
-  pincode: '462010',
-  phone: '+91 755 266 8800',
-  email: 'info@svmbhopal.edu.in',
-  admissionsEmail: 'admissions@svmbhopal.edu.in',
+  pincode: '462022',
+  phone: '+91 78699 66422',
+  email: 'info@rivertonvalley.edu.in',
+  admissionsEmail: 'admissions@rivertonvalley.edu.in',
+  society: 'AKS Educational Society, Bhopal',
   session: '2026–27',
-  students: 1363,
-  staff: 138,
+  students: 1480,
+  staff: 142,
 }
 
 export interface CampusBranch {
@@ -134,23 +135,23 @@ export interface CampusBranch {
 export const CAMPUS_BRANCHES: CampusBranch[] = [
   {
     id: 'main',
-    name: 'Main Campus (Arera Colony)',
-    code: 'SVM-01',
-    location: 'Arera Colony, Bhopal',
+    name: '15-Acre Nature Campus (Bilkhiriya)',
+    code: 'RVS-01',
+    location: 'Bilkhiriya, Raisen Road, Bhopal',
     grades: 'Pre-K to Grade 12',
-    studentsCount: 1420,
-    staffCount: 84,
+    studentsCount: 1040,
+    staffCount: 98,
     principal: 'Dr. Sunita Sharma',
   },
   {
-    id: 'north',
-    name: 'North Campus (Ayodhya Bypass)',
-    code: 'SVM-02',
-    location: 'Ayodhya Bypass, Bhopal',
-    grades: 'Grade 1 to Grade 10',
-    studentsCount: 680,
-    staffCount: 42,
-    principal: 'Mr. Rajeshwar Rao',
+    id: 'city',
+    name: 'City Annex (Arera Colony)',
+    code: 'RVS-02',
+    location: 'Arera Colony, Bhopal',
+    grades: 'Grade 1 to Grade 8',
+    studentsCount: 440,
+    staffCount: 44,
+    principal: 'Ms. Nidhi Lal',
   },
 ]
 

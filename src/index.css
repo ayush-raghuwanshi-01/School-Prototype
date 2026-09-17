@@ -97,7 +97,7 @@
     color-scheme: light;
   }
   .dark {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   * {
@@ -106,16 +106,18 @@
 
   html {
     scroll-behavior: smooth;
+    background-color: #f8fafc;
+    color: #0f172a;
   }
 
   body {
-    @apply bg-ink-50 text-ink-900 font-sans antialiased;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
 
   .dark body {
-    @apply bg-ink-950 text-ink-100;
+    @apply bg-slate-50 text-slate-900;
   }
 
   ::selection {

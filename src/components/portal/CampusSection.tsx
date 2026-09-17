@@ -47,27 +47,25 @@ export function CampusSection() {
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           <div>
-            <Eyebrow>
-              <Trees className="h-3.5 w-3.5" /> The campus
+            <Eyebrow className="text-emerald-800 bg-emerald-50 border-emerald-200">
+              <Trees className="h-3.5 w-3.5 text-emerald-600" /> 15-Acre Nature Campus · Bilkhiriya, Bhopal
             </Eyebrow>
-            <h2 className="mt-4 text-[clamp(2rem,4.2vw,2.9rem)] leading-[1.03] font-extrabold tracking-[-0.04em] text-ink-900 dark:text-white">
-              Eleven acres,
-              <span className="editorial italic text-violet-accent-600 dark:text-violet-accent-400">
-                {' '}
-                deliberately built.{' '}
-              </span>
+            <h2 className="mt-4 text-[clamp(2rem,4.2vw,2.9rem)] leading-[1.03] font-extrabold tracking-[-0.04em] text-slate-900">
+              Fifteen acres,
+              <span className="editorial italic text-emerald-700"> deliberately built. </span>
             </h2>
-            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-600 dark:text-ink-300">
-              We designed the buildings around the timetable, not the other way round. Every wing has its own lab, its
-              own common room and a quiet room that nobody books meetings in.
+            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-slate-600">
+              Situated in the serene, unpolluted environs of Bilkhiriya Bhopal, our 15-acre nature sanctuary is designed
+              around botanical gardens, composite science laboratories, athletics tracks, and air-conditioned smart
+              classrooms.
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-4">
               {[
-                { k: '11.4', v: 'acre campus' },
-                { k: '96', v: 'air-conditioned rooms' },
-                { k: '22', v: 'bus routes' },
-                { k: '61%', v: 'energy offset' },
+                { k: '15.0', v: 'acre nature campus' },
+                { k: '400m', v: 'athletic track & turf' },
+                { k: '6', v: 'Bhopal transit corridors' },
+                { k: '68%', v: 'solar energy offset' },
               ].map((s, i) => (
                 <motion.div
                   key={s.v}
@@ -75,12 +73,12 @@ export function CampusSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.06 }}
-                  className="rounded-2xl border border-ink-200/80 bg-white/60 px-4 py-3.5 backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04]"
+                  className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3.5"
                 >
-                  <p className="text-[22px] leading-none font-extrabold tracking-[-0.04em] text-ink-900 tabular dark:text-white">
+                  <p className="text-[22px] leading-none font-extrabold tracking-[-0.04em] text-slate-900 tabular">
                     {s.k}
                   </p>
-                  <p className="mt-1 text-[11.5px] font-semibold text-ink-500 dark:text-ink-400">{s.v}</p>
+                  <p className="mt-1 text-[11.5px] font-semibold text-slate-500">{s.v}</p>
                 </motion.div>
               ))}
             </div>

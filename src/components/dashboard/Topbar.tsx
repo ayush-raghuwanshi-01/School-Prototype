@@ -34,6 +34,7 @@ const ROLE_ICONS: Record<Role, typeof UserCog> = {
   teacher: PanelsTopLeft,
   accountant: BadgeIndianRupee,
   parent: ShieldCheck,
+  student: GraduationCap,
 }
 
 const TONE_RING: Record<string, string> = {
